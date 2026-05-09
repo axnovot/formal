@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formal?</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      background: white;
+    }
+
+    .page {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: opacity 0.6s ease;
+    }
+
+    #intro {
+      background: white;
+      color: #ff8fb7;
+    }
+
+    #intro h1 {
+      font-size: clamp(2.5rem, 8vw, 5.5rem);
+      font-weight: 400;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.9rem 2rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    }
+
+    #continueBtn {
+      background: #ffb6cf;
+      color: white;
+    }
+
+    #question {
+      display: none;
+      position: relative;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.18)), url("formal.jpg");
+      background-size: cover;
+      background-position: center;
+      color: white;
+      text-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+      justify-content: flex-start;
+      padding-top: 18vh;
+    }
+
+    #question h1 {
+      font-size: clamp(2.4rem, 7vw, 5rem);
+      font-weight: 400;
+      margin-bottom: 2rem;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 1.25rem;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      min-height: 90px;
+    }
+
+    #yesBtn {
+      background: #ff8fb7;
+      color: white;
+      z-index: 2;
+    }
+
+    #noBtn {
+      background: white;
+      color: #ff8fb7;
+      position: fixed;
+      z-index: 3;
+      left: calc(50% + 45px);
+      top: calc(18vh + 7rem);
+    }
+
+    #answer {
+      display: none;
+      margin-top: 1.5rem;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      color: white;
+      text-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+    }
+
+    @media (max-width: 700px) {
+      #question {
+        background-position: center top;
+        padding-top: 15vh;
+      }
+
+      #noBtn {
+        left: calc(50% + 35px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <section id="intro" class="page">
+    <h1>hey bub :)</h1>
+    <button id="continueBtn">continue</button>
+  </section>
+
+  <section id="question" class="page">
+    <h1>be my date to formal?</h1>
+    <div class="buttons">
+      <button id="yesBtn">yes</button>
+      <button id="noBtn">no</button>
+    </div>
+    <div id="answer">yay :)</div>
+  </section>
+
+  <script>
+    const intro = document.getElementById("intro");
+    const question = document.getElementById("question");
+    const continueBtn = document.getElementById("continueBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const answer = document.getElementById("answer");
+
+    continueBtn.addEventListener("click", () => {
+      intro.style.opacity = "0";
+      setTimeout(() => {
+        intro.style.display = "none";
+        question.style.display = "flex";
+        question.style.opacity = "1";
+      }, 500);
+    });
+
+    yesBtn.addEventListener("click", () => {
+      document.body.innerHTML = `
+        <section style="
+          width: 100vw;
+          height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-image: linear-gradient(rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.18)), url('accept_picture.jpg');
+          background-size: cover;
+          background-position: center 35%;
+          color: white;
+          text-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+          font-family: Georgia, 'Times New Roman', serif;
+          font-size: clamp(3rem, 8vw, 6rem);
+          position: relative;
+          overflow: hidden;
+        ">
+          <canvas id="confettiCanvas" style="position: fixed; inset: 0; pointer-events: none;"></canvas>
+          <div style="z-index: 2;">yay! :)</div>
+        </section>
+      `;
+
+      const canvas = document.getElementById("confettiCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const confetti = Array.from({ length: 160 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        size: Math.random() * 8 + 4,
+        speed: Math.random() * 3 + 2,
+        angle: Math.random() * 360,
+        spin: Math.random() * 10 - 5,
+        color: ["#ff8fb7", "#ffb6cf", "#ffffff", "#ffd1dc", "#ffc0cb"][Math.floor(Math.random() * 5)]
+      }));
+
+      function animateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        confetti.forEach(piece => {
+          piece.y += piece.speed;
+          piece.x += Math.sin(piece.angle * Math.PI / 180) * 1.5;
+          piece.angle += piece.spin;
+
+          if (piece.y > canvas.height) {
+            piece.y = -20;
+            piece.x = Math.random() * canvas.width;
+          }
+
+          ctx.save();
+          ctx.translate(piece.x, piece.y);
+          ctx.rotate(piece.angle * Math.PI / 180);
+          ctx.fillStyle = piece.color;
+          ctx.fillRect(-piece.size / 2, -piece.size / 2, piece.size, piece.size * 0.6);
+          ctx.restore();
+        });
+
+        requestAnimationFrame(animateConfetti);
+      }
+
+      animateConfetti();
+    });
+
+    function moveNoButton() {
+      const rect = noBtn.getBoundingClientRect();
+      const padding = 30;
+      const minY = window.innerHeight * 0.22;
+      const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+      const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+
+      let moveX = (Math.random() - 0.5) * 90;
+      let moveY = (Math.random() - 0.5) * 70;
+
+      let newX = rect.left + moveX;
+      let newY = rect.top + moveY;
+
+      newX = Math.max(padding, Math.min(maxX, newX));
+      newY = Math.max(minY, Math.min(maxY, newY));
+
+      noBtn.style.left = `${newX}px`;
+      noBtn.style.top = `${newY}px`;
+    }
+
+    document.addEventListener("mousemove", (event) => {
+      if (question.style.display !== "flex") return;
+
+      const rect = noBtn.getBoundingClientRect();
+      const buttonCenterX = rect.left + rect.width / 2;
+      const buttonCenterY = rect.top + rect.height / 2;
+      const distance = Math.hypot(event.clientX - buttonCenterX, event.clientY - buttonCenterY);
+
+      if (distance < 120) {
+        moveNoButton();
+      }
+    });
+
+    noBtn.addEventListener("mouseenter", moveNoButton);
+  </script>
+</body>
+</html>
